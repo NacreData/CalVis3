@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Calendar Visualization Library: Demo</title>
+</head>
+<link rel="stylesheet" type="text/css" href="http://gcal.appspot.com/calvis/default.css" />
+<script type="text/javascript" src="http://gcal.appspot.com/calvis/calvis.js"></script>
+<script type="text/javascript">
+window.onload = function() {
+  calvis.ready(main);
+}
+
+function main() {
+  var calId = 'developer-calendar@google.com';
+
+  var calendar = new calvis.Calendar();
+
+  // set the CSS IDs for various visual components for the calendar container
+  calendar.setCalendarBody('calendarBodyDiv');
+  calendar.setStatusControl('statusControlDiv');
+  calendar.setNavControl('navControlDiv');
+  calendar.setViewControl('viewControlDiv');
+  calendar.setEventCallback('mouseover', displayEvent);
+
+  // set the calenar to pull data from this Google Calendar account
+  calendar.setPublicCalendar(calId);  
+  calendar.setLoginControl('loginControlDiv');  
+
+  calendar.setDefaultView('month');
+  // display the calendar
+  calendar.render();  
+}
+
+function displayEvent(event) {    
+  var title = event.getTitle().getText();  
+  var date = event.getTimes()[0].getStartTime().getDate();
+  var content = event.getContent().getText();  
+  
+  var eventHtml = [];
+  eventHtml.push(date.toString());
+  eventHtml.push('<br><br>');
+  eventHtml.push('<b>Event title:</b> ');
+  eventHtml.push(title);
+  eventHtml.push('<br>');
+  eventHtml.push('<br>');
+  eventHtml.push('<b>Description:</b>');
+  eventHtml.push('<p style="font-size: 11px;">');
+  eventHtml.push(content); 
+  eventHtml.push('</p>');
+  eventHtml.push('<br>');
+
+  document.getElementById('eventDisplayDiv').innerHTML = eventHtml.join('');
+}      
+</script>
+<body>
+  <div align="center">
+    <img src='dot.gif' style='position:absolute; top: -1000px;'>
+
+    <table style="width: 800px;">
+      <tr>
+        <td colspan="2" valign="top">
+          <div style="float: left;" id="loginControlDiv"></div>
+          <div style="float: right;" id="statusControlDiv"></div>
+        </td>
+      </tr>      
+      <tr>
+        <td valign="top">
+          <div id="navControlDiv"></div>
+        </td>
+        <td valign="top" align="right">
+          <div id="viewControlDiv"></div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" valign="top">
+          <div id="calendarBodyDiv"></div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" valign="top">
+          <div id="eventDisplayDiv"></div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>

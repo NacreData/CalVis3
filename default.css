@@ -1,0 +1,88 @@
+/* optional styling */
+#loginControlDiv {
+	font-size: 13px;
+}
+
+#navControlDiv {
+	font-style: georgia;
+	font-size: 12px;	
+}
+
+#navControlDiv input {
+	border: solid black 1px;
+	font-style: georgia;
+	font-size: 12px;	
+}
+
+#navControlDiv select {
+	border: solid black 1px;
+	font-style: georgia;
+	font-size: 12px;	
+}
+
+#viewControlDiv input {
+	border: solid black 1px;
+	font-style: georgia;
+	font-size: 12px;	
+}
+
+#eventDisplayDiv {
+	padding: 0px;
+	color: black;
+	background: white;
+	font-size: 12px;
+	text-align: left;
+}
+
+#statusControlDiv {
+	font-size: 11px;
+	color: red;
+	height: 20px;
+}
+
+/* required styling */
+
+.columnHeading {
+	text-align: center;
+	font-size: 12px; 
+	color: white; 
+	background: gray; 
+	border: solid white 1px;
+}
+
+.weekViewCell {
+	width: 110px;
+	height: 270px;
+	border: solid gray 1px;
+	text-align: left;
+}
+
+.monthViewCell {
+	width: 110px;
+	height: 80px;
+	border: solid gray 1px;
+	text-align: left;
+}
+
+.contentCell {
+	padding: 2px;
+	font-size: 13px;
+	color: black;
+	font-family: arial;
+}
+
+.eventMouseOver {
+	padding: 0px;
+	font-size: 10px;
+	color: white;	
+	background: black;
+	font-family: arial;
+}
+
+.eventMouseOut {
+	padding: 0px;
+	font-size: 10px;
+	color: blue;
+	background: white;
+	font-family: arial;
+}
