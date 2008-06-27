@@ -23,8 +23,7 @@
 var calvis = {};
 
 // URL paths of scripts to be loaded
-//calvis.baseUrl = 'http://gcal.appspot.com/calvis/';
-calvis.baseUrl = 'http://localhost/calvis/';
+calvis.baseUrl = 'http://gcal.appspot.com/calvis/';
 calvis.gdataUrl = calvis.baseUrl + 'gdata.js';
 calvis.jqueryUrl = calvis.baseUrl + 'jquery.js';
 calvis.coreUrl = calvis.baseUrl + 'calvis-core.js';

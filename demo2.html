@@ -106,7 +106,7 @@ window.onload = function() {
 }
 
 function main() {
-  var calId = 'developer-calendar@google.com';//'dev-community-calendar@google.com';
+  var calId = 'developer-calendar@google.com';
 
   var calendar = new calvis.Calendar();
 
@@ -119,8 +119,6 @@ function main() {
 
   // set the calenar to pull data from this Google Calendar account
   calendar.setPublicCalendar(calId);  
-  //container.setPrivateCalendar('default');
-  //container.setLoginControl('loginControlDiv');  
 
   calendar.setDefaultView('month');
   // display the calendar
@@ -193,12 +191,6 @@ function displayMap(location_) {
       }
     }
   );
-  /*
-  var script = document.createElement('script');
-  script.src = 'http://maps.google.com/maps/geo?q=' + encodeURIComponent(location_.split('@')[0]) + '&output=json&callback=getGeocode&key=ABQIAAAArM7h3NX7hYkBySUFFdiEOhQjm2d_2fsQdVmj8M2c_axD5KoKohTsdfWzgrS_irnGIalR7FIWI6-T3A';
-  console.log(script.src);
-  document.body.appendChild(script);
-  */
 }
 
 function getGeocode(json) {
@@ -261,13 +253,6 @@ function processYouTubeFeed(feed) {
     html.push('</embed></object>');
 
     document.getElementById('video').innerHTML = html.join('');
-    
-    /*
-    var videoDiv = document.createElement('div');
-    videoDiv.innerHTML = html.join('');
-
-    document.getElementById('meta').appendChild(videoDiv);
-    */
   }
 }
 
