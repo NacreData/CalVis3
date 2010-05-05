@@ -776,7 +776,30 @@ calvis.Calendar.prototype.updateMonthView = function() {
  *   A Google Data calendar event object.
  */ 
 calvis.Calendar.prototype.appendEvent = function(id, event) {
+  var eventTime = /T(\d\d):(\d\d)/.exec( event.gd$when[0].startTime );
 
+  var eTime     = '';
+  if( eventTime ) {
+    if( eventTime[1] > 12 ) {
+      eTime = (eventTime[1]-12);
+      if( '00' != eventTime[2] ) {
+        eTime += ':' + eventTime[2] + 'p ';
+      }
+      else {
+        eTime += 'p ';
+      }
+    }
+    else {
+      eTime = eventTime[1];
+      if( '00' != eventTime[2] ) {
+        eTime += ':' + eventTime[2] + ' ';
+      }
+      else {
+        eTime += ' ';
+      }
+    }
+  }
+  
   var calendar = this;
 
   var title = event.getTitle().getText();    
@@ -844,7 +867,7 @@ calvis.Calendar.prototype.appendEvent = function(id, event) {
     eventHtml.push('" class="');
     eventHtml.push(calvis.eventMouseOutClass);
     eventHtml.push('">');
-    eventHtml.push(calendar.fitText('&nbsp;' + title, cellWidth));
+    eventHtml.push(calendar.fitText('&nbsp;' + eTime + title, cellWidth));
     eventHtml.push('</div>');
 
     var eventDiv = jQuery(eventHtml.join(''));
@@ -1028,8 +1051,7 @@ calvis.Calendar.prototype.fitText = function(text, limit) {
   var currentWidth = this.fittingSpan.width();
 
   while (currentWidth > limit) {
-    text = text.replace(/[ .]+$/, '');    
-    text = text.replace(/[^\n\r ]+$/, '...');
+    text = text.replace(/.$/, '');    
     this.fittingSpan.html(text);
     currentWidth = this.fittingSpan.width();
   }
