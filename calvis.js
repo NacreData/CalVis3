@@ -22,11 +22,11 @@
 // Namespace to protect this library from conflicting with external.
 var calvis = {};
 
-// URL paths of scripts to be loaded
-calvis.baseUrl = 'http://gcal.appspot.com/calvis/';
-calvis.gdataUrl = calvis.baseUrl + 'gdata.js';
+// URL paths of scripts to be loaded -- CHANGE TO REFERENCE YOUR SITE
+calvis.baseUrl   = 'http://www.example.com/calvis/';
+calvis.gdataUrl  = calvis.baseUrl + 'gdata.js';
 calvis.jqueryUrl = calvis.baseUrl + 'jquery.js';
-calvis.coreUrl = calvis.baseUrl + 'calvis-core.js';
+calvis.coreUrl   = calvis.baseUrl + 'calvis-core.js';
 
 /**
  * This method loads all the dependent scripts for Calvis and invoke
