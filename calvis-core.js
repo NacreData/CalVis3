@@ -164,25 +164,6 @@ calvis.Calendar.prototype.setPublicCalendar = function(calId) {
 };
 
 /**
- * Set the Google Calendar ID of a private calendar.
- * @param {string} calId The ID of a private Google Calendar.
- */  
-calvis.Calendar.prototype.setPrivateCalendar = function(calId) {
-  this.visibility = 'private';
-  this.calId = calId;
-};
-
-/**
- * Set the CSS ID for the login control.  Login control is where the 
- * login mechanism will be placed, to indicate "log in" or "log out".
- * This control is only necessary for private calendar.
- * @param {string} cssId The CSS ID of the login control.
- */  
-calvis.Calendar.prototype.setLoginControl = function(cssId) {
-  this.loginControlId = cssId;
-};
-
-/**
  * This method should be called after all the CSS IDs and other properties
  * are set and ready to be displayed. 
  */ 
@@ -194,10 +175,6 @@ calvis.Calendar.prototype.render = function() {
 
   // global init
 
-  if (calendar.visibility == 'private') {
-    calendar.initLoginControl();
-  }
- 
   // default view is month view
   calendar.initViewControl();
   
@@ -231,70 +208,6 @@ calvis.Calendar.prototype.setDefaultView = function(view) {
 calvis.Calendar.prototype.getFeedUrl = function() {
   return ['http://www.google.com/calendar/feeds/', 
       this.calId, '/', this.visibility, '/full'].join('');
-};
-
-/**
- * Check to see if here is a valid token available for the 
- * private calendar.
- * @return {boolean} True/false to indicate if there is a valid token.
- */  
-calvis.Calendar.prototype.hasValidToken = function(scope) {
-
-  var success = false;
-
-  if (google.accounts.user.checkLogin(scope)) {
-
-    success = true;
-
-    google.accounts.user.getInfo(function(data) {
-      var target = eval(data.currentTarget.responseText);
-      //console.log(target);      
-      success = true;
-    });
-  } 
-
-  return success;
-};
-
-/**
- * Initialize the login control.
- */  
-calvis.Calendar.prototype.initLoginControl = function() {
-
-  var calendar = this;
-
-  var loginHtml = [];
-
-  loginHtml.push('<a id="');
-  loginHtml.push(calvis.loginLinkId);
-  loginHtml.push('" href="">')
-  loginHtml.push(calvis.loginLabel);
-  loginHtml.push('</a>');
-
-  var loginElement = jQuery(loginHtml.join(''));
-
-  var scope = calendar.getFeedUrl();
-
-  if (!calendar.hasValidToken(scope)) {
-    loginElement.html(calvis.loginLabel);
-  } else {
-    loginElement.html(calvis.logoutLabel);
-  }
-
-  jQuery('#' + calendar.loginControlId).html(loginElement);
-
-  loginElement.bind('click', function(event) {
-
-    event.preventDefault();         
-
-    if (!calendar.hasValidToken(scope)) {
-      google.accounts.user.login(scope);     
-    } else {
-      google.accounts.user.logout();
-      loginElement.html(calvis.loginLabel); 
-    }
-  });  
-
 };
 
 /**

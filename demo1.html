@@ -2,9 +2,8 @@
 <html>
 <head>
 <title>Calendar Visualization Library: Demo</title>
-</head>
-<link rel="stylesheet" type="text/css" href="http://gcal.appspot.com/calvis/default.css" />
-<script type="text/javascript" src="http://gcal.appspot.com/calvis/calvis.js"></script>
+<link rel="stylesheet" type="text/css" href="default.css" />
+<script type="text/javascript" src="calvis.js"></script>
 <script type="text/javascript">
 window.onload = function() {
   calvis.ready(main);
@@ -24,7 +23,6 @@ function main() {
 
   // set the calenar to pull data from this Google Calendar account
   calendar.setPublicCalendar(calId);  
-  calendar.setLoginControl('loginControlDiv');  
 
   calendar.setDefaultView('month');
   // display the calendar
@@ -52,6 +50,7 @@ function displayEvent(event) {
   document.getElementById('eventDisplayDiv').innerHTML = eventHtml.join('');
 }      
 </script>
+</head>
 <body>
   <div align="center">
     <img src='dot.gif' style='position:absolute; top: -1000px;'>
