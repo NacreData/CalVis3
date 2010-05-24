@@ -10,7 +10,8 @@ window.onload = function() {
 }
 
 function main() {
-  var calId = 'developer-calendar@google.com';
+  var calIds = [ 'google@communitygreenguide.org', 
+    'b0prga519c0g0t3crcnc0g9in0@group.calendar.google.com' ];
 
   var calendar = new calvis.Calendar();
 
@@ -22,7 +23,7 @@ function main() {
   calendar.setEventCallback('mouseover', displayEvent);
 
   // set the calenar to pull data from this Google Calendar account
-  calendar.setPublicCalendar(calId);  
+  calendar.setPublicCalendars(calIds);  
 
   calendar.setDefaultView('month');
   // display the calendar

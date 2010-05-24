@@ -88,8 +88,8 @@ calvis.Calendar = function() {
   // The callback method to be invoked when event is triggered to be displayed
   this.eventCallback = null;
 
-  // The calendar ID to be displayed from this container
-  this.calId = null;
+  // The calendar ID(s) to be displayed from this container
+  this.calIds = null;
 
   // The visibility of this calendar, private or public
   this.visibility = null;
@@ -155,12 +155,12 @@ calvis.Calendar.prototype.setEventCallback =
 };
 
 /**
- * Set the Google Calendar ID of a public calendar.
+ * Set the array of Google Calendar IDs of one or more public calendars.
  * @param {string} calId The ID of a public Google Calendar.
  */  
-calvis.Calendar.prototype.setPublicCalendar = function(calId) {
+calvis.Calendar.prototype.setPublicCalendars = function(calIds) {
   this.visibility = 'public';
-  this.calId = calId;
+  this.calIds = calIds;
 };
 
 /**
@@ -202,12 +202,17 @@ calvis.Calendar.prototype.setDefaultView = function(view) {
 };
 
 /**
- * Retrieve the feed URL that will be used for token request 
- * and also for data request of your calendar.
+ * Retrieve the feed URL(s) that will be used for token request 
+ * and also for data request of your calendar(s).
  */ 
-calvis.Calendar.prototype.getFeedUrl = function() {
-  return ['http://www.google.com/calendar/feeds/', 
-      this.calId, '/', this.visibility, '/full'].join('');
+calvis.Calendar.prototype.getFeedUrls = function() {
+  var feedUrlArray = new Array();
+  calIds = this.calIds;
+  for( var i=0; i<calIds.length; i++ ) {
+    feedUrlArray[i] = ['http://www.google.com/calendar/feeds/', calIds[i],
+      '/public/full'].join('');
+  }
+  return feedUrlArray;
 };
 
 /**
@@ -427,7 +432,11 @@ calvis.Calendar.prototype.updateWeekView = function() {
   jQuery('#' + this.calendarBodyId).empty();
   jQuery('#' + this.calendarBodyId).html(weekViewHtml.join(''));
 
-  this.overlayGData(firstDate, lastDate);
+  var feedUriArray = this.getFeedUrls();
+  calendar = this;
+  for( var i=0; i<feedUriArray.length; i++ ) {
+    calendar.overlayGData( firstDate, lastDate, feedUriArray[i] );
+  }
 };
 
 calvis.Calendar.prototype.setYearChooser = function(year) {
@@ -677,7 +686,12 @@ calvis.Calendar.prototype.updateMonthView = function() {
   var lastDate = new Date(firstDate);
   lastDate.setDate(daysInMonth);
 
-  this.overlayGData(firstDate, lastDate);
+  var feedUriArray = this.getFeedUrls();
+  calendar = this;
+  for( var i=0; i<feedUriArray.length; i++ ) {
+    calendar.overlayGData( firstDate, lastDate, feedUriArray[i] );
+  }
+
 };
 
 /**
@@ -854,12 +868,10 @@ calvis.Calendar.prototype.createFittingSpan = function() {
  * @param {Date} startDate The start date that will be used for data query.
  * @param {Date} endDate The end date that will be used for data query.
  */ 
-calvis.Calendar.prototype.overlayGData = function(startDate, endDate) {
+calvis.Calendar.prototype.overlayGData = function(startDate, endDate, feedUri) {
   
   var calendar = this;
 
-  var feedUri = calendar.getFeedUrl();
-  
   // if it is a private account and doesn't have a valid token
   if (calendar.visibility == 'private' && !calendar.hasValidToken(feedUri)) {
     jQuery('#' + this.statusControlId).html(
