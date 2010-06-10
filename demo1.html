@@ -32,11 +32,25 @@ function main() {
 
 function displayEvent(event) {    
   var title = event.getTitle().getText();  
-  var date = event.getTimes()[0].getStartTime().getDate();
+  var date  = event.getTimes()[0].getStartTime().getDate();
+  dString   = date.toString();
+  var dateParts = /^(\w+ \w+ \d+ \d+) (\d+):(\d+):\d/.exec(dString);
+  var time = '';  
+  if( 00 != dateParts[2] ) {
+    if( dateParts[2] > 12 ) {
+      dateParts[2] -= 12;
+      time = dateParts[2] + ':' + dateParts[3] + 'pm';
+    }
+    else {
+      time = dateParts[2] + ':' + dateParts[3] + 'am';
+    }
+  } 
+  var displayDate = dateParts[1] + ' ' + time;
+
   var content = event.getContent().getText();  
   
   var eventHtml = [];
-  eventHtml.push(date.toString());
+  eventHtml.push(displayDate);
   eventHtml.push('<br><br>');
   eventHtml.push('<b>Event title:</b> ');
   eventHtml.push(title);
