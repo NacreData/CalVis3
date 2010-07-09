@@ -3,99 +3,159 @@
 <head>
 <title>Calendar Visualization Library: Demo</title>
 <link rel="stylesheet" type="text/css" href="default.css" />
-<script type="text/javascript" src="calvis.js"></script>
+<script type="text/javascript" src="calvis-core.js"></script>
+<!-- Add Your Google API key here -->
+<script
+	src="http://www.google.com/jsapi?key=ABQIAAAAedBkXrK2yFsT6zhhwlSsCxQj9CErMmZjqOWZLXZytuBjMmwYpRRqRkUZAWLlaIaz_YNa5NTsC2PzhQ"
+	type="text/javascript"></script>
 <script type="text/javascript">
-window.onload = function() {
-  calvis.ready(main);
-}
+	//<![CDATA[
 
-function main() {
-  var calIds = [ 'google@communitygreenguide.org', 
-    'b0prga519c0g0t3crcnc0g9in0@group.calendar.google.com' ];
+	/* Loads the Google data JavaScript client library */
+	google.load("gdata", "2.x"); // Limit to {packages: ["calendar"]}
+	/* Loads the jQuery JavaScript library from teh Google CDN */
+	google.load("jquery", "1.4.2");
 
-  var calendar = new calvis.Calendar();
+	/**
+	 * Callback function for the window onLoad event 
+	 */
+	function OnLoad() {
 
-  // set the CSS IDs for various visual components for the calendar container
-  calendar.setCalendarBody('calendarBodyDiv');
-  calendar.setStatusControl('statusControlDiv');
-  calendar.setNavControl('navControlDiv');
-  calendar.setViewControl('viewControlDiv');
-  calendar.setEventCallback('mouseover', displayEvent);
+		// Override the $ function to make jQuery play nice with other libraries
+		jQuery.noConflict();
 
-  // set the calenar to pull data from this Google Calendar account
-  calendar.setPublicCalendars(calIds);  
+		// init the Google data JS client library with an error handler
+		google.gdata.client.init(handleGDError);
 
-  calendar.setDefaultView('month');
-  // display the calendar
-  calendar.render();  
-}
+		// Google Calendar IDs to Load. Modify this list to show others
+		var calIds = [ 'google@communitygreenguide.org',
+				'b0prga519c0g0t3crcnc0g9in0@group.calendar.google.com' ];
 
-function displayEvent(event) {    
-  var title = event.getTitle().getText();  
-  var date  = event.getTimes()[0].getStartTime().getDate();
-  dString   = date.toString();
-  var dateParts = /^(\w+ \w+ \d+ \d+) (\d+):(\d+):\d/.exec(dString);
-  var time = '';  
-  if( 00 != dateParts[2] ) {
-    if( dateParts[2] > 12 ) {
-      dateParts[2] -= 12;
-      time = dateParts[2] + ':' + dateParts[3] + 'pm';
-    }
-    else {
-      time = dateParts[2] + ':' + dateParts[3] + 'am';
-    }
-  } 
-  var displayDate = dateParts[1] + ' ' + time;
+		// Start calvis rendering
+		loadCalendar(calIds);
+	}
 
-  var content = event.getContent().getText();  
-  
-  var eventHtml = [];
-  eventHtml.push(displayDate);
-  eventHtml.push('<br><br>');
-  eventHtml.push('<b>Event title:</b> ');
-  eventHtml.push(title);
-  eventHtml.push('<br>');
-  eventHtml.push('<br>');
-  eventHtml.push('<b>Description:</b>');
-  eventHtml.push('<p style="font-size: 11px;">');
-  eventHtml.push(content); 
-  eventHtml.push('</p>');
-  eventHtml.push('<br>');
+	/**
+	 * Passes configuration parameters to the Calendar object and calls render().
+	 */
+	function loadCalendar(calIds) {
 
-  document.getElementById('eventDisplayDiv').innerHTML = eventHtml.join('');
-}      
+		var calendar = new calvis.Calendar();
+
+		// set the CSS IDs for various visual components for the calendar container
+		calendar.setCalendarBody('calendarBodyDiv');
+		calendar.setStatusControl('statusControlDiv');
+		calendar.setNavControl('navControlDiv');
+		calendar.setViewControl('viewControlDiv');
+		calendar.setEventCallback('mouseover', displayEvent);
+
+		// set the calenar to pull data from this Google Calendar account
+		calendar.setPublicCalendars(calIds);
+
+		calendar.setDefaultView('month');
+		// display the calendar
+		calendar.render();
+	}
+
+	/**
+	 * Callback function for the Google data JS client library to call when an error
+	 * occurs during the retrieval of the feed. 
+	 *
+	 * @param {Error} e is an instance of an Error 
+	 */
+	function handleGDError(e) {
+		document.getElementById('jsSourceFinal').setAttribute('style',
+				'display:none');
+		if (e instanceof Error) {
+			/* alert with the error line number, file and message */
+			alert('Error at line ' + e.lineNumber + ' in ' + e.fileName + '\n'
+					+ 'Message: ' + e.message);
+			/* if available, output HTTP error code and status text */
+			if (e.cause) {
+				var status = e.cause.status;
+				var statusText = e.cause.statusText;
+				alert('Root cause: HTTP error ' + status
+						+ ' with status text of: ' + statusText);
+			}
+		} else {
+			alert(e.toString());
+		}
+	}
+
+	/**
+	 * Displays the selected event to the user.
+	 *
+	 * @param {Object} event the event to display. 
+	 */
+	function displayEvent(event) {
+		var title = event.getTitle().getText();
+		var date = event.getTimes()[0].getStartTime().getDate();
+		dString = date.toString();
+		var dateParts = /^(\w+ \w+ \d+ \d+) (\d+):(\d+):\d/.exec(dString);
+		var time = '';
+		if (00 != dateParts[2]) {
+			if (dateParts[2] > 12) {
+				dateParts[2] -= 12;
+				time = dateParts[2] + ':' + dateParts[3] + 'pm';
+			} else {
+				time = dateParts[2] + ':' + dateParts[3] + 'am';
+			}
+		}
+		var displayDate = dateParts[1] + ' ' + time;
+
+		var content = event.getContent().getText();
+
+		var eventHtml = [];
+		eventHtml.push(displayDate);
+		eventHtml.push(displayDate);
+		eventHtml.push('<p>');
+		eventHtml.push('<b>Event:</b> ');
+		eventHtml.push(title);
+		eventHtml.push('</p>');
+		eventHtml.push('<h3>Description:</h3>');
+		eventHtml.push('<p>');
+		eventHtml.push(content); 
+		eventHtml.push('</p>');
+
+		document.getElementById('eventDisplayDiv').innerHTML = eventHtml.join('');
+		}
+
+		// Kick things off
+		google.setOnLoadCallback(OnLoad);
+
+		//]]>
 </script>
 </head>
 <body>
-  <div align="center">
-    <img src='dot.gif' style='position:absolute; top: -1000px;'>
+<div align="center"><img src='dot.gif'
+	style='position: absolute; top: -1000px;'>
 
-    <table style="width: 800px;">
-      <tr>
-        <td colspan="2" valign="top">
-          <div style="float: left;" id="loginControlDiv"></div>
-          <div style="float: right;" id="statusControlDiv"></div>
-        </td>
-      </tr>      
-      <tr>
-        <td valign="top">
-          <div id="navControlDiv"></div>
-        </td>
-        <td valign="top" align="right">
-          <div id="viewControlDiv"></div>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" valign="top">
-          <div id="calendarBodyDiv"></div>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2" valign="top">
-          <div id="eventDisplayDiv"></div>
-        </td>
-      </tr>
-    </table>
-  </div>
+<table style="width: 800px;">
+	<tr>
+		<td colspan="2" valign="top">
+		<div style="float: left;" id="loginControlDiv"></div>
+		<div style="float: right;" id="statusControlDiv"></div>
+		</td>
+	</tr>
+	<tr>
+		<td valign="top">
+		<div id="navControlDiv"></div>
+		</td>
+		<td valign="top" align="right">
+		<div id="viewControlDiv"></div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" valign="top">
+		<div id="calendarBodyDiv"></div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" valign="top">
+		<div id="eventDisplayDiv"></div>
+		</td>
+	</tr>
+</table>
+</div>
 </body>
 </html>
