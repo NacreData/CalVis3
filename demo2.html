@@ -11,27 +11,27 @@
 
 #navControlDiv {
 	font-style: "Verdana";
-	font-size: 12px;	
+	font-size: 12px;
 }
 
 #navControlDiv input {
-  background-color: #CEDD70;
-	border: solid #DDD270 1px; 
+	background-color: #CEDD70;
+	border: solid #DDD270 1px;
 	font-style: "Verdana";
-	font-size: 12px;	
+	font-size: 12px;
 }
 
 #navControlDiv select {
 	border: solid black 1px;
 	font-style: "Verdana";
-	font-size: 12px;	
+	font-size: 12px;
 }
 
 #viewControlDiv input {
-  background-color: #CEDD70;
-	border: solid #DDD270 1px; 
+	background-color: #CEDD70;
+	border: solid #DDD270 1px;
 	font-style: "Verdana";
-	font-size: 12px;	
+	font-size: 12px;
 }
 
 #eventDisplayDiv {
@@ -43,21 +43,19 @@
 	text-align: left;
 }
 
-
 #statusControlDiv {
 	font-size: 14px;
 	color: white;
-  background-color: red;
+	background-color: red;
 }
 
 /* required styling */
-
 .columnHeading {
 	text-align: center;
-	font-size: 12px; 
-	color: gray; 
-	background-color: #CEDD70; 
-	border: solid #DDD270 1px; 
+	font-size: 12px;
+	color: gray;
+	background-color: #CEDD70;
+	border: solid #DDD270 1px;
 }
 
 .weekViewCell {
@@ -77,14 +75,14 @@
 .contentCell {
 	padding: 2px;
 	font-size: 10px;
-  border: solid black 0px;
-	color: gray; 
+	border: solid black 0px;
+	color: gray;
 	font-family: "Verdana";
 	overflow: auto;
 }
 
 .eventMouseOver {
-	color: white;	
+	color: white;
 	background-color: #83BC2B;
 }
 
@@ -94,195 +92,249 @@
 }
 </style>
 
-
-<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2.x&amp;key=ABQIAAAArM7h3NX7hYkBySUFFdiEOhS6pD_CAwGenrXaHK_tymI-ZPzisxQOcng1sBSziBsjDR1M5LFZ1FM9Gg"></script>
-<script type="text/javascript" src="calvis.js"></script>
+<script type="text/javascript" src="calvis-core.js"></script>
 <script type="text/javascript" src="Dialog.js"></script>
-
+<!-- Add Your Google API key here -->
+<script
+	src="http://www.google.com/jsapi?key=ABQIAAAAedBkXrK2yFsT6zhhwlSsCxQj9CErMmZjqOWZLXZytuBjMmwYpRRqRkUZAWLlaIaz_YNa5NTsC2PzhQ"
+	type="text/javascript"></script>
 <script type="text/javascript">
+	//<![CDATA[
 
-window.onload = function() {
-  calvis.ready(main);
-}
+	/* Loads the Google data JavaScript client library */
+	google.load("gdata", "2.x");
+	/* Demo requires maps */
+	google.load("maps", "2");
+	/* Loads the jQuery JavaScript library from teh Google CDN */
+	google.load("jquery", "1.4.2");
 
-function main() {
-  var calId = 'developer-calendar@google.com';
+	/**
+	 * Callback function for the window onLoad event 
+	 */
+	function OnLoad() {
 
-  var calendar = new calvis.Calendar();
+		// Override the $ function to make jQuery play nice with other libraries
+		jQuery.noConflict();
 
-  // set the CSS IDs for various visual components for the calendar container
-  calendar.setCalendarBody('calendarBodyDiv');
-  calendar.setNavControl('navControlDiv');
-  calendar.setViewControl('viewControlDiv');
-  calendar.setStatusControl('statusControlDiv');
-  calendar.setEventCallback('click', displayEvent);
+		// init the Google data JS client library with an error handler
+		google.gdata.client.init(handleGDError);
 
-  // set the calenar to pull data from this Google Calendar account
-  calendar.setPublicCalendar(calId);  
+		// Google Calendar IDs to Load. Modify this list to show others
+		var calIds = [ 'google@communitygreenguide.org',
+				'b0prga519c0g0t3crcnc0g9in0@group.calendar.google.com' ];
 
-  calendar.setDefaultView('month');
-  // display the calendar
-  calendar.render();  
+		// Start calvis rendering
+		loadCalendar(calIds);
+	}
 
-  // global lightbox dialog to display event details
-  eventWindow = new Widget.Dialog;
+	/**
+	 * Passes configuration parameters to the Calendar object and calls render().
+	 */
+	function loadCalendar(calIds) {
 
+		var calendar = new calvis.Calendar();
 
-}
+		// set the CSS IDs for various visual components for the calendar container
+		calendar.setCalendarBody('calendarBodyDiv');
+		calendar.setStatusControl('statusControlDiv');
+		calendar.setNavControl('navControlDiv');
+		calendar.setViewControl('viewControlDiv');
+		calendar.setEventCallback('click', displayEvent);
 
-function displayEvent(event) {    
-  var title = event.getTitle().getText();  
-  var date = event.getTimes()[0].getStartTime().getDate();
-  var content = event.getContent().getText();  
-  var location_ = event.getLocations()[0].getValueString().split('@')[0];
+		// set the calenar to pull data from this Google Calendar account
+		calendar.setPublicCalendars(calIds);
 
-  var eventHtml = [];
-  eventHtml.push('<b>Title: </b>');
-  eventHtml.push(title);
-  eventHtml.push('<br>');
-  eventHtml.push('<br>');
-  eventHtml.push('<b>When </b>');
-  eventHtml.push(date.toString());
-  eventHtml.push('<br>');
-  eventHtml.push('<br>');
-  eventHtml.push('<b>Description:</b>');
-  eventHtml.push('<p style="font-size: 12px;">');
-  eventHtml.push(content); 
-  eventHtml.push('</p>');
+		calendar.setDefaultView('month');
+		// display the calendar
+		calendar.render();
 
-  eventHtml.push('<b>Where: </b>');
-  eventHtml.push(location_);
-  eventHtml.push('<br><br>');
-  eventHtml.push('<div align="center">');
-  eventHtml.push('<table>');
-  eventHtml.push('<tr>');
-  eventHtml.push('<td>');
-  eventHtml.push('<div style="border: 1px solid #CEDD70; width: 300px; height: 300px" id="map"/>');
-  eventHtml.push('</td>');
-  eventHtml.push('<td>');
-  eventHtml.push('<div id="video"></div>');
-  eventHtml.push('</td>');
-  eventHtml.push('</tr>');
-  eventHtml.push('</table>');
-  eventHtml.push('</div>');
-  
-  // after this the eventHtml is in the DOM  tree
-  eventWindow.alert(eventHtml.join(''));
+		// global lightbox dialog to display event details
+		eventWindow = new Widget.Dialog;
+	}
 
-  displayMap(location_);
-  displayVideo(title);
-}      
+	/**
+	 * Callback function for the Google data JS client library to call when an error
+	 * occurs during the retrieval of the feed. 
+	 *
+	 * @param {Error} e is an instance of an Error 
+	 */
+	function handleGDError(e) {
+		document.getElementById('jsSourceFinal').setAttribute('style',
+				'display:none');
+		if (e instanceof Error) {
+			/* alert with the error line number, file and message */
+			alert('Error at line ' + e.lineNumber + ' in ' + e.fileName + '\n'
+					+ 'Message: ' + e.message);
+			/* if available, output HTTP error code and status text */
+			if (e.cause) {
+				var status = e.cause.status;
+				var statusText = e.cause.statusText;
+				alert('Root cause: HTTP error ' + status
+						+ ' with status text of: ' + statusText);
+			}
+		} else {
+			alert(e.toString());
+		}
+	}
 
+	/**
+	 * Displays the selected event to the user.
+	 *
+	 * @param {Object} event the event to display. 
+	 */
 
-function displayMap(location_) {
+	function displayEvent(event) {
+		var title = event.getTitle().getText();
+		var date = event.getTimes()[0].getStartTime().getDate();
+		var content = event.getContent().getText();
+		var location_ = event.getLocations()[0].getValueString().split('@')[0];
 
-  var geocoder = new GClientGeocoder();
-  geocoder.getLatLng(
-    location_,
-    function(point) {
-      if (point) {        
-        var map = new GMap2(document.getElementById("map"));
-        map.addControl(new GSmallMapControl());
-        map.setCenter(point, 13);
-        var marker = new GMarker(point);
-        map.addOverlay(marker);
-      } else {
-        document.getElementById('map').parentNode.removeChild(document.getElementById('map'));
-      }
-    }
-  );
-}
+		var eventHtml = [];
+		eventHtml.push('<b>Title: </b>');
+		eventHtml.push(title);
+		eventHtml.push('<br>');
+		eventHtml.push('<br>');
+		eventHtml.push('<b>When </b>');
+		eventHtml.push(date.toString());
+		eventHtml.push('<br>');
+		eventHtml.push('<br>');
+		eventHtml.push('<b>Description:</b>');
+		eventHtml.push('<p style="font-size: 12px;">');
+		eventHtml.push(content);
+		eventHtml.push('</p>');
 
-function getGeocode(json) {
-  var mapData = eval(json);
-  console.log(mapData);
+		eventHtml.push('<b>Where: </b>');
+		eventHtml.push(location_);
+		eventHtml.push('<br><br>');
+		eventHtml.push('<div align="center">');
+		eventHtml.push('<table>');
+		eventHtml.push('<tr>');
+		eventHtml.push('<td>');
+		eventHtml.push('<div style="border: 1px solid #CEDD70; width: 300px; height: 300px" id="map"/>');
+		eventHtml.push('</td>');
+		eventHtml.push('<td>');
+		eventHtml.push('<div id="video"></div>');
+		eventHtml.push('</td>');
+		eventHtml.push('</tr>');
+		eventHtml.push('</table>');
+		eventHtml.push('</div>');
 
-  var status = mapData.Status.code;
-  console.log(status);
-  if (status == '200') {
-    var lng = mapData.Placemark[0].Point.coordinates[0];
-    var lat = mapData.Placemark[0].Point.coordinates[1];
-    console.log(lat + ' ' + lng);
+		// after this the eventHtml is in the DOM  tree
+		eventWindow.alert(eventHtml.join(''));
 
-    var point = new GLatLng(lat,lng);
-    map.setCenter(point, 13);
-    map.addOverlay(new GMarker(point));
+		displayMap(location_);
+		displayVideo(title);
+	}
 
+	function displayMap(location_) {
 
-  }
-}
+		var geocoder = new GClientGeocoder();
+		geocoder.getLatLng(location_, function(point) {
+			if (point) {
+				var map = new GMap2(document.getElementById("map"));
+				map.addControl(new GSmallMapControl());
+				map.setCenter(point, 13);
+				var marker = new GMarker(point);
+				map.addOverlay(marker);
+			} else {
+				document.getElementById('map').parentNode.removeChild(document
+						.getElementById('map'));
+			}
+		});
+	}
 
-function displayVideo(title) {
+	function getGeocode(json) {
+		var mapData = eval(json);
+		console.log(mapData);
 
-  var keywords = title.replace(/ /g, '+');
+		var status = mapData.Status.code;
+		console.log(status);
+		if (status == '200') {
+			var lng = mapData.Placemark[0].Point.coordinates[0];
+			var lat = mapData.Placemark[0].Point.coordinates[1];
+			console.log(lat + ' ' + lng);
 
-  var callbackName = 'processYouTubeFeed';
+			var point = new GLatLng(lat, lng);
+			map.setCenter(point, 13);
+			map.addOverlay(new GMarker(point));
 
-  var youtubeFeed =
-    ['http://gdata.youtube.com/feeds/api/videos?callback=',
-    callbackName, '&alt=json-in-script&vq=',
-    keywords].join('');
+		}
+	}
 
-  var script = document.createElement('script');
-  script.src = youtubeFeed;
+	function displayVideo(title) {
 
-  document.body.appendChild(script);
-}
+		var keywords = title.replace(/ /g, '+');
 
-function processYouTubeFeed(feed) {
- 
-  var data = eval(feed);
+		var callbackName = 'processYouTubeFeed';
 
-  if (data.feed.openSearch$totalResults.$t > 0) {
+		var youtubeFeed = [
+				'http://gdata.youtube.com/feeds/api/videos?callback=',
+				callbackName, '&alt=json-in-script&vq=', keywords ].join('');
 
-    var url = data.feed.entry[0].link[0].href;
-    var id = url.replace('http://www.youtube.com/watch?v=', '');
-    var videoUrl = 'http://www.youtube.com/v/' + id;
+		var script = document.createElement('script');
+		script.src = youtubeFeed;
 
-    var html = [];
+		document.body.appendChild(script);
+	}
 
-    html.push('<object width="250" height="200">');
-    html.push('<param name="movie" value="');
-    html.push(videoUrl);
-    html.push('"></param>');
-    html.push('<param name="wmode" value="transparent"></param>');
-    html.push('<embed src="');
-    html.push(videoUrl);
-    html.push('" type="application/x-shockwave-flash"');
-    html.push(' wmode="transparent" width="250" height="200">');
-    html.push('</embed></object>');
+	function processYouTubeFeed(feed) {
 
-    document.getElementById('video').innerHTML = html.join('');
-  }
-}
+		var data = eval(feed);
 
+		if (data.feed.openSearch$totalResults.$t > 0) {
+
+			var url = data.feed.entry[0].link[0].href;
+			var id = url.replace('http://www.youtube.com/watch?v=', '');
+			var videoUrl = 'http://www.youtube.com/v/' + id;
+
+			var html = [];
+
+			html.push('<object width="250" height="200">');
+			html.push('<param name="movie" value="');
+			html.push(videoUrl);
+			html.push('"></param>');
+			html.push('<param name="wmode" value="transparent"></param>');
+			html.push('<embed src="');
+			html.push(videoUrl);
+			html.push('" type="application/x-shockwave-flash"');
+			html.push(' wmode="transparent" width="250" height="200">');
+			html.push('</embed></object>');
+
+			document.getElementById('video').innerHTML = html.join('');
+		}
+	}
+
+	// Kick things off
+	google.setOnLoadCallback(OnLoad);
+
+	//]]>
+</script>
 </script>
 <body>
 
 
-  <div style="position: absolute; top: 0px; left: 0px;" id="statusControlDiv"></div>
-  <div style="position: absolute; top: 0px; right: 5px;" id="loginControlDiv"></div>
+<div style="position: absolute; top: 0px; left: 0px;"
+	id="statusControlDiv"></div>
+<div style="position: absolute; top: 0px; right: 5px;"
+	id="loginControlDiv"></div>
 
-  <div align="center">
-    <img src='dot.gif' style='position:absolute; top: -1000px;'>
+<div align="center"><img src='dot.gif'
+	style='position: absolute; top: -1000px;'>
 
-    <table>
-      
-      <tr style="text-align: center;" align="left">
-        <td valign="top">
-          <span style="float: left;" id="navControlDiv"></span>
-          <span style="float: right;" id="viewControlDiv"></span>          
-        </td>
-      </tr> 
+<table>
 
-      <tr align="center">
-        <td valign="top">
-          <div id="calendarBodyDiv"></div>
-        </td>
-      </tr>
-    </table>
+	<tr style="text-align: center;" align="left">
+		<td valign="top"><span style="float: left;" id="navControlDiv"></span>
+		<span style="float: right;" id="viewControlDiv"></span></td>
+	</tr>
 
-* Click on events to show details *
-  </div>
+	<tr align="center">
+		<td valign="top">
+		<div id="calendarBodyDiv"></div>
+		</td>
+	</tr>
+</table>
+
+* Click on events to show details *</div>
 </body>
 </html>
