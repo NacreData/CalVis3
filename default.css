@@ -1,3 +1,17 @@
+@CHARSET "UTF-8";
+
+#cal0 {	background-color: green; }
+#cal1 {	background-color: red; }
+#cal2 {	background-color: blue; }
+#cal3 {	background-color: purple; }
+#cal4 {	background-color: orange; }
+#cal5 {	background-color: yellow; }
+
+.today { background-color: #FFF7D7; border-color: #FAD163; }
+
+.more {	background-color: #DDDDDD; color: white; }
+.more:hover, .more:active, .more:focus { background-color: #CCCCCC; }
+
 /* optional styling */
 #loginControlDiv {
 	font-size: 13px;
@@ -85,4 +99,40 @@
 	color: blue;
 	background: white;
 	font-family: arial;
+}
+
+.contentCell div {
+	color: white;
+	padding: 2px;
+	border-radius: 5px;
+	margin-bottom: 1px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+
+.contentCell .middle {
+	border-radius: 0px;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+}
+
+.contentCell .first {
+  -moz-border-radius-topright: 0px;
+  -webkit-border-top-right-radius: 0px;
+  border-top-right-radius: 0px;
+  -moz-border-radius-bottomright: 0px;
+  -webkit-border-bottom-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  background: url(right-arrow.gif) no-repeat right center;
+}
+
+.contentCell .last {
+  -moz-border-radius-topleft: 0px;
+  -webkit-border-top-left-radius: 0px;
+  border-top-left-radius: 0px;
+  -moz-border-radius-bottomleft: 0px;
+  -webkit-border-bottom-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  background: url(left-arrow.gif) no-repeat left center;
+  padding-left: 8px;
 }

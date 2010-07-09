@@ -16,6 +16,7 @@
 
 /**
  * @fileoverview This file contains the core implementation for CalVis.
+ * @author eamonnlinehan@gmail.com (Eamonn Linehan)
  * @author api.austin@google.com (Austin Chau)
  */
 
@@ -48,8 +49,7 @@ calvis.columnHeadingClass = 'columnHeading';
 calvis.weekViewCellClass = 'weekViewCell';
 calvis.monthViewCellClass = 'monthViewCell';
 calvis.contentCellClass = 'contentCell';
-calvis.eventMouseOutClass = 'eventMouseOut';
-calvis.eventMouseOverClass = 'eventMouseOver';
+calvis.eventClass = 'eventItem';
 
 // string labels
 calvis.AppStringLabel = 'Generic-Calendar-Container-1.0';
@@ -99,6 +99,11 @@ calvis.Calendar = function() {
 
   // The current view mode of the container
   this.currentViewMode = null;
+  
+  //Cache todays date
+  this.currentDateCellID = [new Date().getFullYear(), 
+                           calvis.padZero(new Date().getMonth() + 1), 
+                           calvis.padZero(new Date().getDate())].join('');
 };
 
 /**
@@ -405,7 +410,11 @@ calvis.Calendar.prototype.updateWeekView = function() {
 
     var dateHtml = [];
     dateHtml.push('<div class="');
-    dateHtml.push(calvis.weekViewCellClass);
+    
+    // add a class to todays date cell
+    if (dateCellId == this.currentDateCellID) dateHtml.push(calvis.weekViewCellClass + ' today');
+    else dateHtml.push(calvis.weekViewCellClass);
+    
     dateHtml.push('" id=');
     dateHtml.push(dateCellId);
     dateHtml.push('>');
@@ -435,7 +444,7 @@ calvis.Calendar.prototype.updateWeekView = function() {
   var feedUriArray = this.getFeedUrls();
   calendar = this;
   for( var i=0; i<feedUriArray.length; i++ ) {
-    calendar.overlayGData( firstDate, lastDate, feedUriArray[i] );
+    calendar.overlayGData( firstDate, lastDate, feedUriArray[i], i );
   }
 };
 
@@ -617,7 +626,7 @@ calvis.Calendar.prototype.initMonthGrid = function() {
     for (var j=0; j<7 ;j++ )
     {
       monthViewHtml.push('<td id="date' + index + '">');
-      monthViewHtml.push('&nbsp;');
+      // monthViewHtml.push('&nbsp;'); Allow empty rows to collapse
       monthViewHtml.push('</td>');
       index++;
     }
@@ -661,7 +670,11 @@ calvis.Calendar.prototype.updateMonthView = function() {
     var dateHtml = [];
 
     dateHtml.push('<div class="');
-    dateHtml.push(calvis.monthViewCellClass);
+    
+    // add a class to todays date cell
+    if (dateCellId == this.currentDateCellID) dateHtml.push(calvis.monthViewCellClass + ' today');
+    else dateHtml.push(calvis.monthViewCellClass);
+
     dateHtml.push('" id=');
     dateHtml.push(dateCellId);
     dateHtml.push('>');
@@ -689,7 +702,7 @@ calvis.Calendar.prototype.updateMonthView = function() {
   var feedUriArray = this.getFeedUrls();
   calendar = this;
   for( var i=0; i<feedUriArray.length; i++ ) {
-    calendar.overlayGData( firstDate, lastDate, feedUriArray[i] );
+    calendar.overlayGData( firstDate, lastDate, feedUriArray[i], i );
   }
 
 };
@@ -699,10 +712,11 @@ calvis.Calendar.prototype.updateMonthView = function() {
  * JavaScript client library returns the event data.  It will
  * then display the event title on its corresponding date cell.
  * @param {string} id The date cell.
- * @param {google.gdata.calendar.CalendarEventEntry} 
- *   A Google Data calendar event object.
+ * @param {google.gdata.calendar.CalendarEventEntry}  A Google Data calendar event object.
+ * @param {string} label A div ID identifying so that each calendar may have a different style attached to its events 
+ *  
  */ 
-calvis.Calendar.prototype.appendEvent = function(id, event) {
+calvis.Calendar.prototype.appendEvent = function(id, event, label) {
   var eventTime = /T(\d\d):(\d\d)/.exec( event.gd$when[0].startTime );
 
   var eTime     = '';
@@ -740,8 +754,7 @@ calvis.Calendar.prototype.appendEvent = function(id, event) {
   if (cell.length == 0) {
     return;
   }
-  
-  var cellHeight = jQuery('.' + calvis.contentCellClass).parent().height();
+  var cellHeight = cell.parent().height();
   var cellWidth = cell.width();
   var contentFontHeight = parseInt(cell.css('font-size'));
 
@@ -750,8 +763,7 @@ calvis.Calendar.prototype.appendEvent = function(id, event) {
   var bottomMargin = 5;
 
   if (cellHeight < currentContentHeight + contentFontHeight + bottomMargin) {
-    // The contentCell is overflowing, too many events
-    if (cell.get(0).lastChild.innerHTML == calvis.moreLabel) {
+    if (cell.get(0).lastChild != null && cell.get(0).lastChild.innerHTML == calvis.moreLabel) {
       // Can return right away, there is already a "more" link
       return;
     }
@@ -761,7 +773,7 @@ calvis.Calendar.prototype.appendEvent = function(id, event) {
 
     var moreHtml = [];
     moreHtml.push('<div align="right" class="');
-    moreHtml.push(calvis.eventMouseOutClass);
+    moreHtml.push(calvis.eventClass + ' more');
     moreHtml.push('">');
     moreHtml.push(calvis.moreLabel);
     moreHtml.push('</div>');
@@ -774,51 +786,64 @@ calvis.Calendar.prototype.appendEvent = function(id, event) {
       calendar.initWeekView();
     });
 
-    moreDiv.bind('mouseover', function() {
-      moreDiv.removeClass(calvis.eventMouseOutClass);
-      moreDiv.addClass(calvis.eventMouseOverClass); 
-    });
-
-    moreDiv.bind('mouseout', function() {
-      moreDiv.removeClass(calvis.eventMouseOverClass); 
-      moreDiv.addClass(calvis.eventMouseOutClass); 
-    });
-
     cell.append(moreDiv);    
 
   } else {
 
-    var eventHtml = [];
-    eventHtml.push('<div id="');
-    eventHtml.push(eventId);
-    eventHtml.push('" class="');
-    eventHtml.push(calvis.eventMouseOutClass);
-    eventHtml.push('">');
-    eventHtml.push(calendar.fitText('&nbsp;' + eTime + title, cellWidth));
-    eventHtml.push('</div>');
+	  // if greater than a single day then copy into next cell
+	  var times = event.getTimes();
+	  for (i = 0; i < times.length; i++) {
+		  
+		  var days =  Math.floor(times[i].getEndTime().getDate() - times[i].getStartTime().getDate()) / (1000*60*60*24);
 
-    var eventDiv = jQuery(eventHtml.join(''));
-
-    eventDiv.bind(this.eventTrigger, function() {
-      if (calendar.eventCallback) {
-        calendar.eventCallback(event);
-      } else {
-        calendar.defaultEventCallback(event);
-      }      
-    });
-
-    eventDiv.bind('mouseover', function() {
-      eventDiv.removeClass(calvis.eventMouseOutClass);
-      eventDiv.addClass(calvis.eventMouseOverClass); 
-    });
-
-    eventDiv.bind('mouseout', function() {
-      eventDiv.removeClass(calvis.eventMouseOverClass); 
-      eventDiv.addClass(calvis.eventMouseOutClass); 
-    });
-
-    cell.append(eventDiv);
+		  for (j = 0; j < days; j++) {
+			  var date = times[i].getStartTime().getDate();
+			  date.setDate(date.getDate() + j);
+			    
+			  var id = [];           
+			  id.push('content');
+			  id.push(date.getFullYear());
+			  id.push(calvis.padZero(date.getMonth() + 1));
+			  id.push(calvis.padZero(date.getDate()));
+			  id = id.join('');
+			
+			  var cell = jQuery('#' + id); 
+			  
+			  var eventHtml = [];
+			  eventHtml.push('<div id="');
+			  eventHtml.push('cal' + label); // Eamonn 'eventId'
+			  eventHtml.push('" class="');
+			  
+			  if (days > 1) {
+				  if (j == 0) eventHtml.push(calvis.eventClass + ' first');
+				  else if (j == days - 1) eventHtml.push(calvis.eventClass + ' last');
+				  else eventHtml.push(calvis.eventClass + ' middle');
+			  } else {
+				  eventHtml.push(calvis.eventClass);
+			  }
+			  
+			  eventHtml.push('">');
+			  eventHtml.push(calendar.fitText('&nbsp;' + eTime + title, cellWidth));
+			  eventHtml.push('</div>');
+			  
+			  var eventDiv = jQuery(eventHtml.join(''));
+			
+			  eventDiv.bind(this.eventTrigger, function() {
+			    if (calendar.eventCallback) {
+			      calendar.eventCallback(event);
+			    } else {
+			      calendar.defaultEventCallback(event);
+			    }      
+			  });
+			  
+			  cell.append(eventDiv);
+		  }
+	  
+	  }
+    
+    
   }
+  
 };
 
 /**
@@ -848,7 +873,7 @@ calvis.Calendar.prototype.createMoreMenu = function(id) {
   });
 
   return moreDiv;
-}
+};
 
 /**
  * This creates a dummy span that is used to calculate whether 
@@ -860,15 +885,16 @@ calvis.Calendar.prototype.createFittingSpan = function() {
   span.css({'visibility': 'hidden'});
   jQuery(document.body).append(span);
   this.fittingSpan = span;
-}
+};
 
 /**
  * This method overlays the event data between two dates and append
  * these events on their appropriate date cells.
  * @param {Date} startDate The start date that will be used for data query.
  * @param {Date} endDate The end date that will be used for data query.
+ * @param {string} label An identifer used to style events per calendar
  */ 
-calvis.Calendar.prototype.overlayGData = function(startDate, endDate, feedUri) {
+calvis.Calendar.prototype.overlayGData = function(startDate, endDate, feedUri, label) {
   
   var calendar = this;
 
@@ -917,11 +943,11 @@ calvis.Calendar.prototype.overlayGData = function(startDate, endDate, feedUri) {
           id.push(calvis.padZero(date.getDate()));
           id = id.join('');
 
-          calendar.appendEvent(id, event);
+          calendar.appendEvent(id, event, label);
         }
       }
       jQuery('#' + calendar.statusControlId).html('');
-  }
+  };
 
   jQuery('#' + calendar.statusControlId).html(calvis.loadingLabel);
   calendar.calendarService.getEventsFeed(query, callback, calvis.handleError);
@@ -1033,7 +1059,7 @@ calvis.fixIE = function() {
         } 
       }
       return index;
-    }
+    };
   }
   
   // inject "console.log" to emulate Firefox firebug.  
@@ -1045,7 +1071,7 @@ calvis.fixIE = function() {
       var messageDiv = document.createElement('div');
       messageDiv.innerHTML = message;
       body.insertBefore(messageDiv, body.lastChild);
-    }
+    };
   } 
 
 };
