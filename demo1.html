@@ -25,7 +25,7 @@
 		jQuery.noConflict();
 
 		// init the Google data JS client library with an error handler
-		google.gdata.client.init(handleGDError);
+		google.gdata.client.init(calvis.handleError);
 
 		// Google Calendar IDs to Load. Modify this list to show others
 		var calIds = [ 'google@communitygreenguide.org',
@@ -55,31 +55,6 @@
 		calendar.setDefaultView('month');
 		// display the calendar
 		calendar.render();
-	}
-
-	/**
-	 * Callback function for the Google data JS client library to call when an error
-	 * occurs during the retrieval of the feed. 
-	 *
-	 * @param {Error} e is an instance of an Error 
-	 */
-	function handleGDError(e) {
-		document.getElementById('jsSourceFinal').setAttribute('style',
-				'display:none');
-		if (e instanceof Error) {
-			/* alert with the error line number, file and message */
-			alert('Error at line ' + e.lineNumber + ' in ' + e.fileName + '\n'
-					+ 'Message: ' + e.message);
-			/* if available, output HTTP error code and status text */
-			if (e.cause) {
-				var status = e.cause.status;
-				var statusText = e.cause.statusText;
-				alert('Root cause: HTTP error ' + status
-						+ ' with status text of: ' + statusText);
-			}
-		} else {
-			alert(e.toString());
-		}
 	}
 
 	/**
@@ -126,8 +101,7 @@
 </script>
 </head>
 <body>
-<div align="center"><img src='dot.gif'
-	style='position: absolute; top: -1000px;'>
+<div align="center">
 
 <table style="width: 800px;">
 	<tr>

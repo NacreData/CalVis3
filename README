@@ -23,6 +23,12 @@ http://calvis.googlecode.com/svn/trunk/
 
 Changes: 
 
+Jun 9, 2010 (Eamonn Linehan)
+  * Replaced dependencies on local copies of jQuery and gdata with Google hosted ones
+  * Made it possible to style events from different calendars differently
+  * Added limited support for multi-day events
+  * Better looking event display 
+
 May 23, 2010: 
   * remove support for private calendars
   * add support for multiple calendars
@@ -33,5 +39,5 @@ May 5, 2010:
   * Add start time before title display
   * Display more of the title, not ellipsis
 
-
-April 23, 2010: replace jQuery version 1.3.2 with version 1.4.2
+April 23, 2010: 
+  * replace jQuery version 1.3.2 with version 1.4.2
